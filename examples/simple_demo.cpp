@@ -36,25 +36,15 @@ template <typename E = Env<>> struct Program {
 } // namespace temppy
 
 int main() {
-  std::cout << "TempPy: Compile-Time Python Interpreter (Demo)\n";
-  std::cout << "==================================================\n\n";
-
-  std::cout << "Program:\n";
-  std::cout << "  x = 5\n";
-  std::cout << "  y = x * 2\n";
-  std::cout << "  z = x + y\n\n";
-
   using result = temppy::Program<>;
 
   static_assert(result::x == 5);
   static_assert(result::y == 10);
   static_assert(result::z == 15);
 
-  std::cout << "Results (computed at compile-time):\n";
   std::cout << "  x = " << result::x << "\n";
   std::cout << "  y = " << result::y << "\n";
   std::cout << "  z = " << result::z << "\n";
-  std::cout << "\nAll calculations were performed by the C++ compiler!\n";
 
   return 0;
 }

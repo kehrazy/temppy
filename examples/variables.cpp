@@ -1,4 +1,4 @@
-#include "../include/temppy/temppy.hpp"
+#include "temppy/temppy.hpp"
 #include <iostream>
 
 template <typename Env, typename VarName> constexpr int lookup_var() {
@@ -68,9 +68,6 @@ int main() {
     std::cout << "x = x * 2  # x is now 4\n";
     std::cout << "x -> " << x_value::value << "\n\n";
   }
-
-  std::cout << "All compile-time assertions passed!\n";
-  std::cout << "All variable computations were performed at compile time.\n";
 
   return 0;
 }

@@ -1,4 +1,4 @@
-#include "../include/temppy/temppy.hpp"
+#include "temppy/temppy.hpp"
 #include <iostream>
 
 int main() {

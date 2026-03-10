@@ -1,11 +1,19 @@
-CXX = g++
-CXXFLAGS = -std=c++23 -Wall -Wextra -I./include -ftemplate-depth=2000 -O0 -static
+CXX ?= g++
+CPPFLAGS ?= -I./include
+CXXFLAGS ?= -std=c++23 -O0 -Wall -Wextra -Wpedantic -ftemplate-depth=2000
+LDFLAGS ?=
 
-EXAMPLES_DIR = examples
-BUILD_DIR = build
+BUILD_DIR := build
+EXAMPLES_DIR := examples
+TESTS_DIR := tests
+EXAMPLE_BUILD_DIR := $(BUILD_DIR)/examples
+TEST_BUILD_DIR := $(BUILD_DIR)/tests
 
-EXAMPLES = $(BUILD_DIR)/basic_arithmetic $(BUILD_DIR)/variables $(BUILD_DIR)/complex
-TESTS = $(BUILD_DIR)/test_lexer $(BUILD_DIR)/test_parser $(BUILD_DIR)/test_eval
+EXAMPLE_NAMES := basic_arithmetic variables complex language_features control_flow simple_demo
+TEST_NAMES := test_eval_features test_lexer test_string_literals test_control_flow
+
+EXAMPLES := $(addprefix $(EXAMPLE_BUILD_DIR)/,$(EXAMPLE_NAMES))
+TESTS := $(addprefix $(TEST_BUILD_DIR)/,$(TEST_NAMES))
 
 .PHONY: all examples tests clean run-examples run-tests
 
@@ -13,27 +21,35 @@ all: examples tests
 
 examples: $(EXAMPLES)
 
+tests: $(TESTS)
+
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/basic_arithmetic: $(EXAMPLES_DIR)/basic_arithmetic.cpp | $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) $< -o $@
+$(EXAMPLE_BUILD_DIR): | $(BUILD_DIR)
+	mkdir -p $(EXAMPLE_BUILD_DIR)
 
-$(BUILD_DIR)/variables: $(EXAMPLES_DIR)/variables.cpp | $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) $< -o $@
+$(TEST_BUILD_DIR): | $(BUILD_DIR)
+	mkdir -p $(TEST_BUILD_DIR)
 
-$(BUILD_DIR)/complex: $(EXAMPLES_DIR)/complex.cpp | $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) $< -o $@
+$(EXAMPLE_BUILD_DIR)/%: $(EXAMPLES_DIR)/%.cpp | $(EXAMPLE_BUILD_DIR)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@ $(LDFLAGS)
+
+$(TEST_BUILD_DIR)/%: $(TESTS_DIR)/%.cpp | $(TEST_BUILD_DIR)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@ $(LDFLAGS)
 
 run-examples: examples
-	@echo "Running Basic Arithmetic Example:"
-	@./$(BUILD_DIR)/basic_arithmetic
-	@echo ""
-	@echo "Running Variables Example:"
-	@./$(BUILD_DIR)/variables
-	@echo ""
-	@echo "Running Complex Example:"
-	@./$(BUILD_DIR)/complex
+	@for exe in $(EXAMPLES); do \
+		echo "Running $$(basename $$exe):"; \
+		./$$exe; \
+		echo ""; \
+	done
+
+run-tests: tests
+	@for exe in $(TESTS); do \
+		echo "Running $$(basename $$exe):"; \
+		./$$exe; \
+	done
 
 clean:
 	rm -rf $(BUILD_DIR)
